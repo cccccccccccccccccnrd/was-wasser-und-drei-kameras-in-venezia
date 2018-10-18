@@ -55,7 +55,7 @@ board.on('ready', () => {
 
   /* state manipulation through pose evaluation */
   function evaluatePose () {
-    if (state.pose.keypoints[4].score > 0.2) {
+    if (state.pose.keypoints[10].score > 0.2) {
       state.relay = true
       communicate()
     } else {
