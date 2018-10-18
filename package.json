@@ -1,0 +1,17 @@
+{
+  "name": "self",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.3",
+    "johnny-five": "^1.0.0",
+    "ws": "^5.2.1"
+  },
+  "devDependencies": {}
+}
