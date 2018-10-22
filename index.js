@@ -33,33 +33,34 @@ const webSocketServer = new WebSocket.Server({ port: 1717 })
 
 /* initialize arduino board */
 board.on('ready', () => {
-  const relay = new five.Relay({
-    pin: 3,
-    type: 'NC'
-  })
+  const controller = five.Motor.SHIELD_CONFIGS.ADAFRUIT_V1
+
+  const motor = new five.Motor(controller.M1)
 
   /* global state */
   let state = {
     pose: {},
-    relay: false
+    motor: 50
   }
+
+  communicate()
 
   /* communication to arduino */
   function communicate () {
-    if (state.relay) {
-      relay.open()
-    } else {
-      relay.close()
+    if (state.motor) {
+      motor.forward(state.motor)
     }
   }
 
   /* state manipulation through pose evaluation */
   function evaluatePose () {
     if (state.pose.keypoints[4].score > 0.2) {
-      state.relay = true
+      // state.relay = true
+      state.motor = 100
       communicate()
     } else {
-      state.relay = false
+      // state.relay = false
+      state.motor = 50
       communicate()
     }
   }
