@@ -2,7 +2,7 @@ const socket = new WebSocket('ws://localhost:1717')
 
 const cameras = [{
   position: 'front',
-  deviceId: '9a26207fa19a3e90ce766af1cca4ae5ce6b99f8d5179fffcad9e107c13c5dc0b'
+  deviceId: '07f25729c053ade09d8f84173ad2db1fb297f8c6e1e68be71e87abf208126c0d'
 }, {
   position: 'left',
   deviceId: '9a26207fa19a3e90ce766af1cca4ae5ce6b99f8d5179fffcad9e107c13c5dc0b'
@@ -35,8 +35,8 @@ function init (limit, detection = false) {
     const video = document.createElement('video')
 
     video.setAttribute('id', camera.position)
-    video.setAttribute('width', '1280')
-    video.setAttribute('height', '720')
+    video.setAttribute('width', '600')
+    video.setAttribute('height', '338')
     document.body.appendChild(video)
 
     stream(video, camera.deviceId, detection)
@@ -69,7 +69,7 @@ async function poseDetectionFrame (camera) {
 
   if (socket.readyState == 1) socket.send(JSON.stringify(pose))
 
-  repositionCamera(camera, pose.keypoints)
+  // repositionCamera(camera, pose.keypoints)
 
   requestAnimationFrame(() => {
     poseDetectionFrame(camera)
