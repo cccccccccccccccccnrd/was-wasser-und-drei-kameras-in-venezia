@@ -64,28 +64,33 @@ board.on('ready', () => {
 
   /* state manipulation through pose evaluation */
   function evaluatePoses () {
-    console.log(state)
-    console.log(state.poses)
+    // console.log(state)
+    // console.log(state.poses)
 
-    /* const positions = state.poses.filter(() => keypoints[0].position.x)
-    const distances = positions.reduce((a, b) => a - b) */
+    const width = 600
 
-    const person_01 = state.poses[0].keypoints[0].position.x
-    const person_02 = state.poses[1].keypoints[0].position.x
+    const positions = state.poses.map(pose => {
+      return Math.floor(pose.keypoints[0].position.x)
+    })
 
-    const distance = person_01 - person_02
+    if (positions.length >= 2) {
+      const distance = positions.reduce((a, b) => b - a)
 
-    if (distance > person_01 / 2) {
-      state.relay_01 = true
-      state.relay_02 = false
+      console.log(distance)
 
-      communicate()
-    } else {
-      state.relay_01 = false
-      state.relay_02 = true
-
-      communicate()
+      if (Math.abs(Math.floor(distance)) > width / 4) {
+        state.relay_01 = true
+        state.relay_02 = false
+  
+        communicate()
+      } else {
+        state.relay_01 = false
+        state.relay_02 = true
+  
+        communicate()
+      }
     }
+
 
     /* const width = 600
 
