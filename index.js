@@ -33,84 +33,65 @@ const webSocketServer = new WebSocket.Server({ port: 1717 })
 
 /* initialize arduino board */
 board.on('ready', () => {
-  // const motor_1 = new five.Servo(9)
-  // const motor_2 = new five.Servo(10)
-  // const motor_3 = new five.Servo(11)
 
-  const relay_1 = new five.Relay({
+  const relay_01 = new five.Relay({
     pin: 10, 
     type: 'NC'
   })
 
-  const relay_2 = new five.Relay({
+  const relay_02 = new five.Relay({
     pin: 11, 
     type: 'NC'
   })
 
   /* global state */
   let state = {
-    pose: {},
-    motor_1: false,
-    motor_2: false,
-    motor_3: false
-  }
-
-  function move(motor) {
-    const from = 0
-    const to = 180
-    const t = 500
-
-    motor.open()
-
-    setTimeout(() => {
-      motor.close()
-    }, t)
-
-    // motor.sweep()
-
-    /* setTimeout(() => {
-      motor.to(to, t)
-    }, t) */ 
+    poses: [],
+    relay_01: false,
+    relay_02: false
   }
 
   /* communication to arduino */
   function communicate () {
-    if (state.motor_1) {
-      move(relay_1)
-      // motor_2.stop()
-      // motor_3.stop()
-    } else if (state.motor_2) {
-      move(relay_2)
-      // motor_1.stop()
-      // motor_3.stop()
-    } else if (state.motor_3) {
-      move(motor_3)
-      // motor_1.stop()
-      // motor_2.stop()
-    } else if (!state.motor_1 && !state.motor_2 && !state.motor_3) {
-      // motor_1.stop()
-      // motor_2.stop()
-      // motor_3.stop()
+    if (state.relay_01) {
+      relay_01.open()
+      relay_02.close()
+    } else if (state.relay_02) {
+      relay_01.close()
+      relay_02.open()
     }
   }
 
   /* state manipulation through pose evaluation */
-  function evaluatePose () {
+  function evaluatePoses () {
     console.log(state)
-    console.log(state.pose.keypoints[0].position.x)
+    console.log(state.poses)
 
-    const width = 600
+    /* const positions = state.poses.filter(() => keypoints[0].position.x)
+    const distances = positions.reduce((a, b) => a - b) */
 
-    if (state.pose.keypoints[0].position.x < 0) {
-      state.in_frame = false
+    const person_01 = state.poses[0].keypoints[0].position.x
+    const person_02 = state.poses[1].keypoints[0].position.x
+
+    const distance = person_01 - person_02
+
+    if (distance > person_01 / 2) {
+      state.relay_01 = true
+      state.relay_02 = false
+
+      communicate()
     } else {
-      state.in_frame = true
+      state.relay_01 = false
+      state.relay_02 = true
+
+      communicate()
     }
 
-    if (state.pose.keypoints[0].score < 0.3) {
+    /* const width = 600
+
+     if (state.pose.keypoints[0].score < 0.3) {
       state.motor_1 = false
       state.motor_2 = false
-      state.motor_3 = false
 
       communicate()
     } else if (state.pose.keypoints[0].position.x > 0 && state.pose.keypoints[0].position.x < width / 2) {
@@ -121,32 +102,6 @@ board.on('ready', () => {
     } else if (state.pose.keypoints[0].position.x > width / 2 && state.pose.keypoints[0].position.x < width) {
       state.motor_1 = false
       state.motor_2 = true
-
-      communicate()
-    }
-
-    /* if (state.pose.keypoints[0].score < 0.3) {
-      state.motor_1 = false
-      state.motor_2 = false
-      state.motor_3 = false
-
-      communicate()
-    } else if (state.pose.keypoints[0].position.x > 0 && state.pose.keypoints[0].position.x < width / 3) {
-      state.motor_1 = true
-      state.motor_2 = false
-      state.motor_3 = false
-
-      communicate()
-    } else if (state.pose.keypoints[0].position.x > width / 3 && state.pose.keypoints[0].position.x < width / 3 + width / 3) {
-      state.motor_1 = false
-      state.motor_2 = true
-      state.motor_3 = false
-
-      communicate()
-    } else if (state.pose.keypoints[0].position.x > width / 3 + width / 3 && state.pose.keypoints[0].position.x < width) {
-      state.motor_1 = false
-      state.motor_2 = false
-      state.motor_3 = true
 
       communicate()
     } */
@@ -161,10 +116,10 @@ board.on('ready', () => {
         }
       })
 
-      const pose = JSON.parse(message)
+      const poses = JSON.parse(message)
 
-      state.pose = pose
-      evaluatePose()
+      state.poses = poses
+      evaluatePoses()
     })
   })
 })

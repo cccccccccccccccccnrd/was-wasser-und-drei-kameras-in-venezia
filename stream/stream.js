@@ -17,6 +17,7 @@ const imageScaleFactor = 0.2
 const flipHorizontal = true
 const outputStride = 32
 const minPartConfidence = 0.1
+const maxPoseDetections = 2
 
 init(1, true)
 
@@ -65,30 +66,11 @@ async function detect (camera) {
 }
 
 async function poseDetectionFrame (camera) {
-  const pose = await network.estimateSinglePose(camera, imageScaleFactor, flipHorizontal, outputStride)
+  const poses = await network.estimateMultiplePoses(camera, imageScaleFactor, flipHorizontal, outputStride, maxPoseDetections)
 
-  if (socket.readyState == 1) socket.send(JSON.stringify(pose))
-
-  // repositionCamera(camera, pose.keypoints)
+  if (socket.readyState == 1) socket.send(JSON.stringify(poses))
 
   requestAnimationFrame(() => {
     poseDetectionFrame(camera)
   })
-}
-
-/* synchronizing camera */
-function repositionCamera (camera, keypoints) {
-  const keypoint = keypoints[0]
-
-  if (keypoint.score < minPartConfidence) {
-    camera.style.opacity = '0'
-  } else {
-    camera.style.opacity = null
-  }
-
-  const { y, x } = keypoint.position
-  const correctedX = x - camera.width / 2
-  const correctedY = (y - camera.height / 2) * -1
-
-  camera.style.transform = 'translate(' + correctedX + 'px, ' + correctedY + 'px)'
 }
