@@ -3,7 +3,7 @@ const WebSocket = require('ws')
 
 const five = require('johnny-five')
 const board = new five.Board({
-  port: 'COM5'
+  // port: 'COM5'
 })
 
 /* stream server setup */
@@ -32,84 +32,59 @@ console.log('visualization server is running on http://localhost:' + visualizati
 const webSocketServer = new WebSocket.Server({ port: 1717 })
 
 /* initialize arduino board */
-board.on('ready', () => {
-
-  const relay_01 = new five.Relay({
-    pin: 10, 
-    type: 'NC'
-  })
-
-  const relay_02 = new five.Relay({
-    pin: 11, 
-    type: 'NC'
-  })
+board.on('ready', function() {
+  this.pinMode(9, five.Pin.PWM)
+  this.pinMode(10, five.Pin.PWM)
 
   /* global state */
   let state = {
+    board: this,
     poses: [],
-    relay_01: false,
-    relay_02: false
+    left: [],
+    right: []
   }
 
   /* communication to arduino */
   function communicate () {
-    if (state.relay_01) {
-      relay_01.open()
-      relay_02.close()
-    } else if (state.relay_02) {
-      relay_01.close()
-      relay_02.open()
+    const self = state.board
+    const speedBase = 75
+    const speedForEach = 25
+    const speedMax = 255
+
+    if (state.left.length === 0 && state.right.length === 0) return
+
+    if (state.left.length === 0) {
+      self.analogWrite(9, 0)
+      self.analogWrite(10, Math.min(speedBase + state.right.length * speedForEach, speedMax))
+    } else if (state.right.length === 0) {
+      self.analogWrite(9, Math.min(speedBase + state.left.length * speedForEach, speedMax))
+      self.analogWrite(10, 0)
+    } else {
+      self.analogWrite(9, Math.min(speedBase + state.left.length * speedForEach, speedMax))
+      self.analogWrite(10, Math.min(speedBase + state.right.length * speedForEach, speedMax))
     }
+
+    setTimeout(() => {
+      self.analogWrite(9, 0)
+      self.analogWrite(10, 0)
+    }, 100)
   }
 
   /* state manipulation through pose evaluation */
   function evaluatePoses () {
-    // console.log(state)
-    // console.log(state.poses)
-
     const width = 600
 
-    const positions = state.poses.map(pose => {
-      return Math.floor(pose.keypoints[0].position.x)
-    })
+    const positions = state.poses.map(pose => Math.floor(pose.keypoints[0].position.x))
 
-    if (positions.length >= 2) {
-      const distance = positions.reduce((a, b) => b - a)
+    const left = positions.filter(pose => pose > width / 2)
+    const right = positions.filter(pose => pose < width / 2)
 
-      console.log(distance)
+    console.log(left, right)
 
-      if (Math.abs(Math.floor(distance)) > width / 4) {
-        state.relay_01 = true
-        state.relay_02 = false
-  
-        communicate()
-      } else {
-        state.relay_01 = false
-        state.relay_02 = true
-  
-        communicate()
-      }
-    }
+    state.left = left
+    state.right = right
 
-
-    /* const width = 600
-
-     if (state.pose.keypoints[0].score < 0.3) {
-      state.motor_1 = false
-      state.motor_2 = false
-
-      communicate()
-    } else if (state.pose.keypoints[0].position.x > 0 && state.pose.keypoints[0].position.x < width / 2) {
-      state.motor_1 = true
-      state.motor_2 = false
-
-      communicate()
-    } else if (state.pose.keypoints[0].position.x > width / 2 && state.pose.keypoints[0].position.x < width) {
-      state.motor_1 = false
-      state.motor_2 = true
-
-      communicate()
-    } */
+    communicate()
   }
 
   /* incoming pose estimation from streaming server */
