@@ -70,7 +70,7 @@ async function poseDetectionFrame (camera) {
 
   if (socket.readyState == 1) socket.send(JSON.stringify(poses))
 
-  const fr = 2000
+  const fr = 5000
 
   setTimeout(() => {
     poseDetectionFrame(camera)

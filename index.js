@@ -67,7 +67,7 @@ board.on('ready', function() {
     setTimeout(() => {
       self.analogWrite(9, 0)
       self.analogWrite(10, 0)
-    }, 100)
+    }, 200)
   }
 
   /* state manipulation through pose evaluation */
