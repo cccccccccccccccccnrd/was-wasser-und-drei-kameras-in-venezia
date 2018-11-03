@@ -56,9 +56,9 @@ board.on('ready', function() {
     const speedForEach = 25
     const speedMax = 255
 
-    if (state.left.length === 0 && state.right.length === 0) return
-
-    if (state.left.length === 0) {
+    if (state.left.length === 0 && state.right.length === 0) {
+      return
+    } else if (state.left.length === 0) {
       self.analogWrite(9, 0)
       self.analogWrite(10, Math.min(speedBase + state.right.length * speedForEach, speedMax))
     } else if (state.right.length === 0) {
