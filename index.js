@@ -36,11 +36,6 @@ board.on('ready', function() {
   this.pinMode(9, five.Pin.PWM)
   this.pinMode(10, five.Pin.PWM)
 
-  function init(poses) {
-    const evaluatedPoses = getEvaluatedPoses(poses)
-    communicate(evaluatedPoses)
-  }
-
   /* global state */
   let state = {
     board: this,
@@ -81,8 +76,8 @@ board.on('ready', function() {
 
     const positions = state.poses.map(pose => Math.floor(pose.keypoints[0].position.x))
 
-    const left = positions.filter(pose => pose > width / 2)
-    const right = positions.filter(pose => pose < width / 2)
+    const left = positions.filter(position => position < width / 2)
+    const right = positions.filter(position => position > width / 2)
 
     console.log(left, right)
 
