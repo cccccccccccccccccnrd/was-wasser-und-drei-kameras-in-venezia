@@ -36,6 +36,11 @@ board.on('ready', function() {
   this.pinMode(9, five.Pin.PWM)
   this.pinMode(10, five.Pin.PWM)
 
+  function init(poses) {
+    const evaluatedPoses = getEvaluatedPoses(poses)
+    communicate(evaluatedPoses)
+  }
+
   /* global state */
   let state = {
     board: this,
@@ -96,9 +101,7 @@ board.on('ready', function() {
         }
       })
 
-      const poses = JSON.parse(message)
-
-      state.poses = poses
+      state.poses = JSON.parse(message)
       evaluatePoses()
     })
   })
