@@ -1,18 +1,23 @@
 const socket = new WebSocket('ws://localhost:1717')
-const canvas = document.getElementById('visualization')
+const canvas = document.querySelector('#visualization')
 const canvasCtx = canvas.getContext('2d')
+const timer = document.querySelector('#timer')
 
-let pose, poses = [], keys = []
+let keys = []
 
 /* websocket handeling */
 socket.addEventListener('message', event => {
-  pose = JSON.parse(event.data)
-  poses.push(pose)
-  visualize(pose.keypoints, canvasCtx)
+  const poses = JSON.parse(event.data)
+
+  restartInterval()
+
+  poses.forEach(pose => {
+    visualize(pose.keypoints)
+  })
 })
 
 /* drawing data onto canvas */
-function visualize (keypoints, ctx, scale = 1) {
+function visualize (keypoints, scale = 1) {
   for (let i = 0; i <= 0; i++) {
     const keypoint = keypoints[i]
 
@@ -21,49 +26,28 @@ function visualize (keypoints, ctx, scale = 1) {
     }
 
     const { y, x } = keypoint.position
-    /* const gradient = ctx.createRadialGradient(x, y, 0, x, y, 500)
-    gradient.addColorStop(0, 'red')
-    gradient.addColorStop(1, 'black')
-    ctx.fillStyle = gradient
-    ctx.fillRect(0, 0, canvas.width, canvas.height) */
 
-    ctx.beginPath()
-    ctx.arc(x * scale, y * scale, 1, 0, 2 * Math.PI)
-    ctx.fillStyle = 'rgb(0, 0, 0)'
-    ctx.fill()
+    canvasCtx.beginPath()
+    canvasCtx.arc(x * scale, y * scale, 3, 0, 2 * Math.PI)
+    canvasCtx.fillStyle = 'rgba(0, 0, 0, 1)'
+    canvasCtx.fill()
   }
 }
 
-/* clear canvas and optionally extract poses as data and visualization */
-function restart (extract = false) {
-  if (extract) extractPoses()
+function restartInterval() {
+  canvasCtx.fillStyle = 'rgba(255, 255, 255, 1)'
+  canvasCtx.fillRect(0, 0, 1280, 720)
 
-  canvasCtx.clearRect(0, 0, canvas.width, canvas.height)
-  poses = []
-}
+  const duration = 2000 + 500
+  let time = duration
 
-function extractPoses () {
-  const timestamp = Date.now()
+  const countdown = setInterval(() => {
+    time = time - 10
+    timer.innerText = time
+  }, 10)
 
-  const aVisualization = document.createElement('a')
-  const image = canvas.toDataURL()
-  aVisualization.href = image
-  aVisualization.download = timestamp + '-visualization.png'
-  aVisualization.click()
-
-  const aData = document.createElement('a')
-  const file = new Blob([JSON.stringify(poses)], { type: 'text/plain' })
-  aData.href = URL.createObjectURL(file)
-  aData.download = timestamp + '-data.txt'
-  aData.click()
-}
-
-document.onkeydown = document.onkeyup = (event) => {
-  keys[event.keyCode] = event.type == 'keydown'
-
-  if (keys[82] && keys[69]) {
-    restart(true) 
-  } else if (keys[82]) {
-    restart()
-  }
+  setTimeout(() => {
+    timer.innerText = '0'
+    clearInterval(countdown)
+  }, duration)
 }

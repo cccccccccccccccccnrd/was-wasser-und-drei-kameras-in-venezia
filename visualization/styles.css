@@ -3,15 +3,29 @@ html, body {
   padding: 0;
 }
 
+p {
+  margin: 0;
+  padding: 0;
+}
+
 body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  font-family: 'Inconsolata', monospace;
+  font-size: 20px;
   background: white;
+  overflow: hidden;
+}
+
+#timer {
+  position: fixed;
+  bottom: 2em;
+  right: 2em;
+  z-index: 1;
+  font-size: 3em;
 }
 
 #visualization {
   transform: scale(-1, 1);
 }
-

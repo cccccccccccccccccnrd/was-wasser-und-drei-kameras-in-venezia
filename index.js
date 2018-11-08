@@ -33,12 +33,18 @@ const webSocketServer = new WebSocket.Server({ port: 1717 })
 
 /* initialize arduino board */
 board.on('ready', function() {
-  this.pinMode(9, five.Pin.PWM)
-  this.pinMode(10, five.Pin.PWM)
+  const relay_01 = new five.Relay({
+    pin: 10,
+    type: 'NC'
+  })
+
+  const relay_02 = new five.Relay({
+    pin: 11,
+    type: 'NC'
+  })
 
   /* global state */
   let state = {
-    board: this,
     poses: [],
     left: [],
     right: []
@@ -46,33 +52,39 @@ board.on('ready', function() {
 
   /* communication to arduino */
   function communicate () {
-    const self = state.board
-    const speedBase = 75
-    const speedForEach = 25
-    const speedMax = 255
+    const duration = 1000
 
     if (state.left.length === 0 && state.right.length === 0) {
       return
     } else if (state.left.length === 0) {
-      self.analogWrite(9, 0)
-      self.analogWrite(10, Math.min(speedBase + state.right.length * speedForEach, speedMax))
-    } else if (state.right.length === 0) {
-      self.analogWrite(9, Math.min(speedBase + state.left.length * speedForEach, speedMax))
-      self.analogWrite(10, 0)
-    } else {
-      self.analogWrite(9, Math.min(speedBase + state.left.length * speedForEach, speedMax))
-      self.analogWrite(10, Math.min(speedBase + state.right.length * speedForEach, speedMax))
-    }
+      relay_01.open()
 
-    setTimeout(() => {
-      self.analogWrite(9, 0)
-      self.analogWrite(10, 0)
-    }, 200)
+      setTimeout(() => {
+        relay_01.close()
+      }, state.right.length * duration)
+    } else if (state.right.length === 0) {
+      relay_02.open()
+
+      setTimeout(() => {
+        relay_02.close()
+      }, state.left.length * duration)
+    } else {
+      relay_01.open()
+      relay_02.open()
+
+      setTimeout(() => {
+        relay_01.close()
+      }, state.right.length * duration)
+
+      setTimeout(() => {
+        relay_02.close()
+      }, state.left.length * duration)
+    }
   }
 
   /* state manipulation through pose evaluation */
   function evaluatePoses () {
-    const width = 600
+    const width = 1280
 
     const positions = state.poses.map(pose => Math.floor(pose.keypoints[0].position.x))
 
@@ -86,18 +98,18 @@ board.on('ready', function() {
 
     communicate()
   }
+})
 
-  /* incoming pose estimation from streaming server */
-  webSocketServer.on('connection', function connection(ws) {
-    ws.on('message', function incoming(message) {
-      webSocketServer.clients.forEach(function each(client) {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-          client.send(message)
-        }
-      })
-
-      state.poses = JSON.parse(message)
-      evaluatePoses()
+/* incoming pose estimation from streaming server */
+webSocketServer.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    webSocketServer.clients.forEach(function each(client) {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(message)
+      }
     })
+
+    /* state.poses = JSON.parse(message)
+    evaluatePoses() */
   })
 })

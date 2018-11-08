@@ -17,7 +17,7 @@ const imageScaleFactor = 0.2
 const flipHorizontal = true
 const outputStride = 32
 const minPartConfidence = 0.1
-const maxPoseDetections = 2
+const maxPoseDetections = 10
 
 init(1, true)
 
@@ -36,8 +36,8 @@ function init (limit, detection = false) {
     const video = document.createElement('video')
 
     video.setAttribute('id', camera.position)
-    video.setAttribute('width', '600')
-    video.setAttribute('height', '600')
+    video.setAttribute('width', '1280')
+    video.setAttribute('height', '720')
     document.body.appendChild(video)
 
     stream(video, camera.deviceId, detection)
@@ -70,7 +70,7 @@ async function poseDetectionFrame (camera) {
 
   if (socket.readyState == 1) socket.send(JSON.stringify(poses))
 
-  const fr = 5000
+  const fr = 1000
 
   setTimeout(() => {
     poseDetectionFrame(camera)
