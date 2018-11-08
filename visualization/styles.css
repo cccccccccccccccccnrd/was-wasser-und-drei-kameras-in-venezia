@@ -14,7 +14,7 @@ body {
   justify-content: center;
   font-family: 'Inconsolata', monospace;
   font-size: 20px;
-  background: white;
+  background: black;
   overflow: hidden;
 }
 
@@ -23,7 +23,8 @@ body {
   bottom: 2em;
   right: 2em;
   z-index: 1;
-  font-size: 3em;
+  font-size: 8em;
+  color: white;
 }
 
 #visualization {

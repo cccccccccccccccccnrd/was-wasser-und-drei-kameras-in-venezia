@@ -2,7 +2,7 @@ const socket = new WebSocket('ws://localhost:1717')
 
 const cameras = [{
   position: 'front',
-  deviceId: '9a26207fa19a3e90ce766af1cca4ae5ce6b99f8d5179fffcad9e107c13c5dc0b'
+  deviceId: '9025ae6f0c013ded4e38a7821bd8c6f95ed652118d48e24654ca4e564e1fb9f4'
 }, {
   position: 'left',
   deviceId: '9a26207fa19a3e90ce766af1cca4ae5ce6b99f8d5179fffcad9e107c13c5dc0b'
@@ -70,7 +70,7 @@ async function poseDetectionFrame (camera) {
 
   if (socket.readyState == 1) socket.send(JSON.stringify(poses))
 
-  const fr = 1000
+  const fr = 5 * 1000
 
   setTimeout(() => {
     poseDetectionFrame(camera)

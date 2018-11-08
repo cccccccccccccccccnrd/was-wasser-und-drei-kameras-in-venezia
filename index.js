@@ -3,7 +3,7 @@ const WebSocket = require('ws')
 
 const five = require('johnny-five')
 const board = new five.Board({
-  // port: 'COM5'
+  port: 'COM6'
 })
 
 /* stream server setup */
@@ -34,12 +34,12 @@ const webSocketServer = new WebSocket.Server({ port: 1717 })
 /* initialize arduino board */
 board.on('ready', function() {
   const relay_01 = new five.Relay({
-    pin: 10,
+    pin: 9,
     type: 'NC'
   })
 
   const relay_02 = new five.Relay({
-    pin: 11,
+    pin: 10,
     type: 'NC'
   })
 
@@ -52,7 +52,7 @@ board.on('ready', function() {
 
   /* communication to arduino */
   function communicate () {
-    const duration = 1000
+    const duration = 4000
 
     if (state.left.length === 0 && state.right.length === 0) {
       return
@@ -61,24 +61,24 @@ board.on('ready', function() {
 
       setTimeout(() => {
         relay_01.close()
-      }, state.right.length * duration)
+      }, duration)
     } else if (state.right.length === 0) {
       relay_02.open()
 
       setTimeout(() => {
         relay_02.close()
-      }, state.left.length * duration)
+      }, duration)
     } else {
       relay_01.open()
       relay_02.open()
 
       setTimeout(() => {
         relay_01.close()
-      }, state.right.length * duration)
+      }, duration)
 
       setTimeout(() => {
         relay_02.close()
-      }, state.left.length * duration)
+      }, duration)
     }
   }
 
@@ -88,8 +88,8 @@ board.on('ready', function() {
 
     const positions = state.poses.map(pose => Math.floor(pose.keypoints[0].position.x))
 
-    const left = positions.filter(position => position < width / 2)
-    const right = positions.filter(position => position > width / 2)
+    const left = positions.filter(position => position < width / 2 + 100)
+    const right = positions.filter(position => position > width / 2 - 100)
 
     console.log(left, right)
 
@@ -98,18 +98,18 @@ board.on('ready', function() {
 
     communicate()
   }
-})
 
-/* incoming pose estimation from streaming server */
-webSocketServer.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    webSocketServer.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message)
-      }
+  /* incoming pose estimation from streaming server */
+  webSocketServer.on('connection', function connection(ws) {
+    ws.on('message', function incoming(message) {
+      webSocketServer.clients.forEach(function each(client) {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          client.send(message)
+        }
+      })
+  
+      state.poses = JSON.parse(message)
+      evaluatePoses()
     })
-
-    /* state.poses = JSON.parse(message)
-    evaluatePoses() */
   })
 })

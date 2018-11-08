@@ -28,17 +28,17 @@ function visualize (keypoints, scale = 1) {
     const { y, x } = keypoint.position
 
     canvasCtx.beginPath()
-    canvasCtx.arc(x * scale, y * scale, 3, 0, 2 * Math.PI)
-    canvasCtx.fillStyle = 'rgba(0, 0, 0, 1)'
+    canvasCtx.arc(x * scale, y * scale, 8, 0, 2 * Math.PI)
+    canvasCtx.fillStyle = 'rgba(255, 255, 255, 1)'
     canvasCtx.fill()
   }
 }
 
 function restartInterval() {
-  canvasCtx.fillStyle = 'rgba(255, 255, 255, 1)'
+  canvasCtx.fillStyle = 'rgba(0, 0, 0, 1)'
   canvasCtx.fillRect(0, 0, 1280, 720)
 
-  const duration = 2000 + 500
+  const duration = 5 * 1000 + 1000
   let time = duration
 
   const countdown = setInterval(() => {
