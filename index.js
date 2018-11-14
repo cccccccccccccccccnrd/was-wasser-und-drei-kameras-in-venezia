@@ -3,7 +3,7 @@ const WebSocket = require('ws')
 
 const five = require('johnny-five')
 const board = new five.Board({
-  /* port: 'COM6' */
+  port: 'COM6'
 })
 
 /* stream server setup */
@@ -27,6 +27,17 @@ const visualizationServer = express()
 visualizationServer.use(express.static(visualizationServerSettings.staticPath))
 visualizationServer.listen(visualizationServerSettings.port)
 console.log('visualization server is running on http://localhost:' + visualizationServerSettings.port)
+
+/* visualization server setup */
+const apiServerSettings = {
+  port: 3002,
+  staticPath: 'api'
+}
+const apiServer = express()
+
+apiServer.use(express.static(apiServerSettings.staticPath))
+apiServer.listen(apiServerSettings.port)
+console.log('api server is running on http://localhost:' + apiServerSettings.port)
 
 /* websocket server setup */
 const webSocketServer = new WebSocket.Server({ port: 1717 })
@@ -99,18 +110,18 @@ board.on('ready', function() {
 
     communicate()
   }
-})
 
-/* incoming pose estimation from streaming server */
-webSocketServer.on('connection', function connection(ws) {
-  ws.on('message', function incoming(message) {
-    webSocketServer.clients.forEach(function each(client) {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(message)
-      }
+  /* incoming pose estimation from streaming server */
+  webSocketServer.on('connection', function connection(ws) {
+    ws.on('message', function incoming(message) {
+      webSocketServer.clients.forEach(function each(client) {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+          client.send(message)
+        }
+      })
+
+      state.poses = JSON.parse(message)
+      evaluatePoses()
     })
-
-    /* state.poses = JSON.parse(message)
-    evaluatePoses() */
   })
 })

@@ -24,4 +24,6 @@ body {
   color: white;
   background: black;
   border: 0;
+  user-select: none;
+  resize: none;
 }

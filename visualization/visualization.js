@@ -1,8 +1,10 @@
 const socket = new WebSocket('ws://localhost:1717')
 const timeLeft = document.querySelector('#left .time')
 const timeRight = document.querySelector('#right .time')
-const agentLeft = document.querySelector('#left .agent')
-const agentRight = document.querySelector('#right .agent')
+const agentPositionLeft = document.querySelector('#left .position')
+const agentPositionRight = document.querySelector('#right .position')
+const agentCountLeft = document.querySelector('#left .count')
+const agentCountRight = document.querySelector('#right .count')
 
 let state = {
   left: [],
@@ -35,8 +37,11 @@ function evaluatePoses (poses) {
   state.left = left
   state.right = right
 
-  agentLeft.innerText = JSON.stringify(left)
-  agentRight.innerText = JSON.stringify(right)
+  agentCountLeft.innerText = JSON.stringify(left.length)
+  agentPositionLeft.innerText = JSON.stringify(left)
+
+  agentCountRight.innerText = JSON.stringify(right.length)
+  agentPositionRight.innerText = JSON.stringify(right)
 }
 
 /* drawing data onto canvas */
