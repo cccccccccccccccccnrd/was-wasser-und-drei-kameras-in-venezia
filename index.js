@@ -85,11 +85,12 @@ board.on('ready', function() {
   /* state manipulation through pose evaluation */
   function evaluatePoses () {
     const width = 1280
+    const overlap = 150
 
     const positions = state.poses.map(pose => Math.floor(pose.keypoints[0].position.x))
 
-    const left = positions.filter(position => position < width / 2 + 100)
-    const right = positions.filter(position => position > width / 2 - 100)
+    const left = positions.filter(position => position < width / 2 + overlap)
+    const right = positions.filter(position => position > width / 2 - overlap)
 
     console.log(left, right)
 
