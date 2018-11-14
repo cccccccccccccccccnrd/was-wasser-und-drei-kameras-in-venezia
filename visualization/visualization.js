@@ -1,11 +1,9 @@
-const socket = new WebSocket('ws://192.168.2.98:1717')
-/* const canvas = document.querySelector('#visualization')
-const canvasCtx = canvas.getContext('2d')
-const timer = document.querySelector('#timer') */
-const api = document.querySelector('#api')
+const socket = new WebSocket('ws://localhost:1717')
+const timeLeft = document.querySelector('#left .time')
+const timeRight = document.querySelector('#right .time')
+const agentLeft = document.querySelector('#left .agent')
+const agentRight = document.querySelector('#right .agent')
 
-
-let keys = []
 let state = {
   left: [],
   right: []
@@ -16,9 +14,9 @@ socket.addEventListener('message', event => {
   const poses = JSON.parse(event.data)
   evaluatePoses(poses)
 
-  /* restartInterval()
+  restartInterval()
 
-  poses.forEach(pose => {
+  /* poses.forEach(pose => {
     visualize(pose.keypoints)
   }) */
 })
@@ -37,7 +35,8 @@ function evaluatePoses (poses) {
   state.left = left
   state.right = right
 
-  api.innerText = JSON.stringify(state, null, 2)
+  agentLeft.innerText = JSON.stringify(left)
+  agentRight.innerText = JSON.stringify(right)
 }
 
 /* drawing data onto canvas */
@@ -59,19 +58,18 @@ function visualize (keypoints, scale = 1) {
 }
 
 function restartInterval() {
-  canvasCtx.fillStyle = 'rgba(0, 0, 0, 1)'
-  canvasCtx.fillRect(0, 0, 1280, 720)
-
   const duration = 5 * 1000 + 1000
   let time = duration
 
   const countdown = setInterval(() => {
     time = time - 10
-    timer.innerText = time
+    timeLeft.innerText = time
+    timeRight.innerText = time
   }, 10)
 
   setTimeout(() => {
-    timer.innerText = '0'
+    timeLeft.innerText = '0'
+    timeRight.innerText = '0'
     clearInterval(countdown)
   }, duration)
 }

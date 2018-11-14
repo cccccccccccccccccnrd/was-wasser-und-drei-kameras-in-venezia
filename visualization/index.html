@@ -1,15 +1,20 @@
 <html>
 <head>
-  <title>self-visualization</title>
+  <title>translation of presence, overlay</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
   <link href="https://fonts.googleapis.com/css?family=Inconsolata" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<textarea id="api" rows="10" spellcheck="false" readonly></textarea>
-<!-- <p id="timer">0000</p>
-<canvas id="visualization" width="1280" height="720"></canvas> -->
+  <section id="left">
+    <p>update <span class="time"></span></p>
+    <p>agents <span class="agent"></span></p>
+  </section>
+  <section id="right">
+    <p>update <span class="time"></span></p>
+    <p>agents <span class="agent"></span></p>
+  </section>
 
-<script src="visualization.js"></script>
+  <script src="visualization.js"></script>
 </body>
 </html>

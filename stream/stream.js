@@ -2,7 +2,7 @@ const socket = new WebSocket('ws://localhost:1717')
 
 const cameras = [{
   position: 'front',
-  deviceId: '50ce45305dd319e5da6c7b671d3ff7eabca05eeb979cb446ace257d28785bc2f'
+  deviceId: '9a26207fa19a3e90ce766af1cca4ae5ce6b99f8d5179fffcad9e107c13c5dc0b'
 }, {
   position: 'left',
   deviceId: '9a26207fa19a3e90ce766af1cca4ae5ce6b99f8d5179fffcad9e107c13c5dc0b'
